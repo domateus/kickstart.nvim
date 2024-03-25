@@ -1,3 +1,17 @@
+vim.api.nvim_create_autocmd('ColorScheme', {
+  group = vim.api.nvim_create_augroup('custom_highlights_everforest', {}),
+  pattern = 'everforest',
+  callback = function()
+    local config = vim.fn['everforest#get_configuration']()
+    local palette = vim.fn['everforest#get_palette'](config.background, config.colors_override)
+    local set_hl = vim.fn['everforest#highlight']
+
+    set_hl('TSFunction', palette.green, palette.none, 'bold')
+    set_hl('@function.method.call.python', palette.green, palette.none, 'bold')
+    set_hl('@function.method.call.typescript', palette.green, palette.none, 'bold')
+    set_hl('@function.method.call.java', palette.green, palette.none, 'bold')
+  end,
+})
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded ()
@@ -655,7 +669,6 @@ require('lazy').setup {
     priority = 1000,
     config = function()
       vim.cmd.colorscheme 'everforest'
-
       vim.cmd.hi 'Comment gui=none'
     end,
   },

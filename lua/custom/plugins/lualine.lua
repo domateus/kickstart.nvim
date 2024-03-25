@@ -1,6 +1,7 @@
 return {
   'nvim-lualine/lualine.nvim',
   options = {
+    theme = 'everforest',
     sections = {
       lualine_a = {},
       lualine_b = { 'tabs' },
