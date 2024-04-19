@@ -1,17 +1,3 @@
-vim.api.nvim_create_autocmd('ColorScheme', {
-  group = vim.api.nvim_create_augroup('custom_highlights_everforest', {}),
-  pattern = 'everforest',
-  callback = function()
-    local config = vim.fn['everforest#get_configuration']()
-    local palette = vim.fn['everforest#get_palette'](config.background, config.colors_override)
-    local set_hl = vim.fn['everforest#highlight']
-
-    set_hl('TSFunction', palette.green, palette.none, 'bold')
-    set_hl('@function.method.call.python', palette.green, palette.none, 'bold')
-    set_hl('@function.method.call.typescript', palette.green, palette.none, 'bold')
-    set_hl('@function.method.call.java', palette.green, palette.none, 'bold')
-  end,
-})
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded ()
@@ -88,7 +74,7 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
+vim.keymap.set('n', '<C-b>', '<Esc>:Explore<cr>', { desc = 'Opens Newtr explorer on current window' })
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -107,13 +93,8 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
 vim.keymap.set('n', '<leader>o', '<Esc>:vsplit<cr>', { desc = 'Right split' })
-vim.keymap.set('n', '<leader>bq', '<Esc>:bd<cr>', { desc = 'Close buffer' })
+vim.keymap.set('n', '<leader>bd', '<Esc>:bd<cr>', { desc = 'Close buffer' })
 vim.keymap.set('n', '<leader>j', '<Esc>:bprevious<cr>', { desc = 'Goes to the previous buffer' })
 vim.keymap.set('n', '<leader>k', '<Esc>:bnext<cr>', { desc = 'Goes to the previous buffer' })
 -- [[ Basic Autocommands ]]
@@ -152,6 +133,10 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
+  {
+    'folke/twilight.nvim',
+    opts = {},
+  },
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   'justinmk/vim-sneak',
   {
@@ -548,26 +533,6 @@ require('lazy').setup {
     end,
   },
 
-  { -- Autoformat
-    'stevearc/conform.nvim',
-    opts = {
-      notify_on_error = false,
-      format_on_save = {
-        timeout_ms = 500,
-        lsp_fallback = true,
-      },
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
-      },
-    },
-  },
-
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
@@ -669,7 +634,6 @@ require('lazy').setup {
     priority = 1000,
     config = function()
       vim.cmd.colorscheme 'everforest'
-      vim.cmd.hi 'Comment gui=none'
     end,
   },
   {
@@ -772,4 +736,4 @@ require('lazy').setup {
 }
 
 -- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
+--vim: ts=2 sts=2 sw=2 et
