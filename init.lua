@@ -1,3 +1,35 @@
+vim.api.nvim_create_autocmd('ColorScheme', {
+  group = vim.api.nvim_create_augroup('custom_highlights_everforest', {}),
+  pattern = 'everforest',
+  callback = function()
+    local config = vim.fn['everforest#get_configuration']()
+    local palette = vim.fn['everforest#get_palette'](config.background, config.colors_override)
+    local set_hl = vim.fn['everforest#highlight']
+
+    -- set_hl('Search', palette.none, palette.bg_visual_yellow)
+    -- set_hl('IncSearch', palette.none, palette.bg_visual_red)
+    set_hl('@keyword.python', palette.red, palette.none, 'bold')
+    set_hl('@keyword.import.python', palette.red, palette.none, 'bold')
+    set_hl('@keyword.from.python', palette.red, palette.none, 'bold')
+    set_hl('@keyword.return.python', palette.red, palette.none, 'bold')
+    set_hl('@keyword.conditional.python', palette.red, palette.none, 'bold')
+    set_hl('@keyword.operator.python', palette.red, palette.none, 'bold')
+    set_hl('@keyword.type.python', palette.red, palette.none, 'bold')
+    set_hl('@keyword.repeat.python', palette.red, palette.none, 'bold')
+    set_hl('@keyword.function.python', palette.red, palette.none, 'bold')
+
+    set_hl('@function.call.typescript', palette.green, palette.none, 'bold')
+    set_hl('@function.method.call.tsx', palette.green, palette.none, 'bold')
+    set_hl('@function.call.tsx', palette.green, palette.none, 'bold')
+    set_hl('@lsp.type.function', palette.green, palette.none, 'bold')
+    set_hl('@keyword.tsx', palette.red, palette.none, 'bold')
+    set_hl('@keyword.return.tsx', palette.red, palette.none, 'bold')
+    set_hl('@keyword.function.tsx', palette.red, palette.none, 'bold')
+    set_hl('@type.typescript', palette.yellow, palette.none, 'italic')
+
+    set_hl('@type.go', palette.yellow, palette.none, 'italic')
+  end,
+})
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded ()
@@ -51,7 +83,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '» ', lead = '.', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -69,12 +101,14 @@ vim.opt.scrolloff = 10
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
+vim.keymap.set('n', 'Z', 'f{zf%<CR>', { desc = 'Fold under next {' })
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.keymap.set('n', '<C-b>', '<Esc>:Explore<cr>', { desc = 'Opens Newtr explorer on current window' })
+vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -94,7 +128,7 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --
 --  See `:help wincmd` for a list of all window commands
 vim.keymap.set('n', '<leader>o', '<Esc>:vsplit<cr>', { desc = 'Right split' })
-vim.keymap.set('n', '<leader>bd', '<Esc>:bd<cr>', { desc = 'Close buffer' })
+vim.keymap.set('n', '<leader>bd', '<Esc>:b#|bd#<cr>', { desc = 'Close buffer' })
 vim.keymap.set('n', '<leader>j', '<Esc>:bprevious<cr>', { desc = 'Goes to the previous buffer' })
 vim.keymap.set('n', '<leader>k', '<Esc>:bnext<cr>', { desc = 'Goes to the previous buffer' })
 -- [[ Basic Autocommands ]]
@@ -132,6 +166,7 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
+
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   {
     'folke/twilight.nvim',
@@ -197,17 +232,26 @@ require('lazy').setup {
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VeryLazy', -- Sets the loading event to 'VeryLazy'
+    keys = {
+      {
+        '<leader>?',
+        function()
+          require('which-key').show { global = false }
+        end,
+        desc = 'Buffer Local Keymaps (which-key)',
+      },
+    },
     config = function() -- This is the function that runs, AFTER loading
       require('which-key').setup()
 
       -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-      }
+      -- require('which-key').register {
+      --   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+      --   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
+      --   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+      --   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
+      --   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+      -- }
     end,
   },
 
@@ -338,6 +382,7 @@ require('lazy').setup {
       { 'j-hui/fidget.nvim', opts = {} },
     },
     config = function()
+      -- require('java').setup()
       -- Brief Aside: **What is LSP?**
       --
       -- LSP is an acronym you've probably heard, but might not understand what it is.
@@ -463,7 +508,7 @@ require('lazy').setup {
         -- clangd = {},
         -- gopls = {},
         jdtls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -622,6 +667,13 @@ require('lazy').setup {
           { name = 'luasnip' },
           { name = 'path' },
         },
+
+        cmp.setup.filetype({ 'sql' }, {
+          sources = {
+            { name = 'vim-dadbod-completion' },
+            { name = 'buffer' },
+          },
+        }),
       }
     end,
   },
@@ -634,6 +686,7 @@ require('lazy').setup {
     priority = 1000,
     config = function()
       vim.cmd.colorscheme 'everforest'
+      vim.g.everforest_enable_italic = true
     end,
   },
   {
@@ -715,25 +768,5 @@ require('lazy').setup {
     end,
   },
 
-  -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- put them in the right spots if you want.
-
-  -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for kickstart
-  --
-  --  Here are some example plugins that I've included in the kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    This is the easiest way to modularize your config.
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   { import = 'custom.plugins' },
 }
-
--- The line beneath this is called `modeline`. See `:help modeline`
---vim: ts=2 sts=2 sw=2 et
