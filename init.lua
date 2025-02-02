@@ -165,6 +165,7 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
+
 require('lazy').setup {
 
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -203,7 +204,7 @@ require('lazy').setup {
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
-      current_line_blame = true,
+      current_line_blame = false,
       signs = {
         add = { text = '+' },
         change = { text = '~' },
@@ -383,6 +384,7 @@ require('lazy').setup {
     },
     config = function()
       -- require('java').setup()
+      -- require('lspconfig').jdtls.setup {}
       -- Brief Aside: **What is LSP?**
       --
       -- LSP is an acronym you've probably heard, but might not understand what it is.
@@ -505,20 +507,12 @@ require('lazy').setup {
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
-        -- gopls = {},
-        jdtls = {},
-        pyright = {},
-        -- rust_analyzer = {},
+        gopls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
-        --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
-        --
-
+        ['ts_ls'] = {},
         lua_ls = {
           -- cmd = {...},
           -- filetypes { ...},
@@ -559,11 +553,13 @@ require('lazy').setup {
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format lua code
+        'lua_ls', -- Used to format lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
+        automatic_installation = true,
+        ensure_installed = ensure_installed,
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
@@ -573,6 +569,22 @@ require('lazy').setup {
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
           end,
+          -- jdtls = function()
+          --   require('java').setup {
+          --     -- custom jdtls configs
+          --   }
+          --   require('lspconfig').jdtls.setup {
+          --     java_debug_adapter = {
+          --       enable = true,
+          --       version = '0.58.1',
+          --     },
+          --     jdtls = {
+          --       version = 'v1.43.0',
+          --     },
+          --
+          --     -- custom nvim-java configs
+          --   }
+          -- end,
         },
       }
     end,
@@ -685,8 +697,8 @@ require('lazy').setup {
     lazy = false,
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'everforest'
-      vim.g.everforest_enable_italic = true
+      -- vim.cmd.colorscheme 'everforest'
+      -- vim.g.everforest_enable_italic = true
     end,
   },
   {
@@ -694,6 +706,10 @@ require('lazy').setup {
     name = 'rose-pine',
     variant = 'moon', -- auto, main, moon, or dawn
     dark_variant = 'moon', -- main, moon, or dawn
+    config = function()
+      vim.cmd.colorscheme 'rose-pine'
+      vim.g.everforest_enable_italic = true
+    end,
   },
 
   -- Highlight todo, notes, etc in comments
@@ -752,7 +768,7 @@ require('lazy').setup {
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
+        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'java' },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = { enable = true },
