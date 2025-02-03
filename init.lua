@@ -1,35 +1,37 @@
-vim.api.nvim_create_autocmd('ColorScheme', {
-  group = vim.api.nvim_create_augroup('custom_highlights_everforest', {}),
-  pattern = 'everforest',
-  callback = function()
-    local config = vim.fn['everforest#get_configuration']()
-    local palette = vim.fn['everforest#get_palette'](config.background, config.colors_override)
-    local set_hl = vim.fn['everforest#highlight']
+-- Special highlight for everforest colorscheme
+-- vim.api.nvim_create_autocmd('ColorScheme', {
+--   group = vim.api.nvim_create_augroup('custom_highlights_everforest', {}),
+--   pattern = 'everforest',
+--   callback = function()
+--     local config = vim.fn['everforest#get_configuration']()
+--     local palette = vim.fn['everforest#get_palette'](config.background, config.colors_override)
+--     local set_hl = vim.fn['everforest#highlight']
+--
+--     -- set_hl('Search', palette.none, palette.bg_visual_yellow)
+--     -- set_hl('IncSearch', palette.none, palette.bg_visual_red)
+--     set_hl('@keyword.python', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.import.python', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.from.python', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.return.python', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.conditional.python', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.operator.python', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.type.python', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.repeat.python', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.function.python', palette.red, palette.none, 'bold')
+--
+--     set_hl('@function.call.typescript', palette.green, palette.none, 'bold')
+--     set_hl('@function.method.call.tsx', palette.green, palette.none, 'bold')
+--     set_hl('@function.call.tsx', palette.green, palette.none, 'bold')
+--     set_hl('@lsp.type.function', palette.green, palette.none, 'bold')
+--     set_hl('@keyword.tsx', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.return.tsx', palette.red, palette.none, 'bold')
+--     set_hl('@keyword.function.tsx', palette.red, palette.none, 'bold')
+--     set_hl('@type.typescript', palette.yellow, palette.none, 'italic')
+--
+--     set_hl('@type.go', palette.yellow, palette.none, 'italic')
+--   end,
+-- })
 
-    -- set_hl('Search', palette.none, palette.bg_visual_yellow)
-    -- set_hl('IncSearch', palette.none, palette.bg_visual_red)
-    set_hl('@keyword.python', palette.red, palette.none, 'bold')
-    set_hl('@keyword.import.python', palette.red, palette.none, 'bold')
-    set_hl('@keyword.from.python', palette.red, palette.none, 'bold')
-    set_hl('@keyword.return.python', palette.red, palette.none, 'bold')
-    set_hl('@keyword.conditional.python', palette.red, palette.none, 'bold')
-    set_hl('@keyword.operator.python', palette.red, palette.none, 'bold')
-    set_hl('@keyword.type.python', palette.red, palette.none, 'bold')
-    set_hl('@keyword.repeat.python', palette.red, palette.none, 'bold')
-    set_hl('@keyword.function.python', palette.red, palette.none, 'bold')
-
-    set_hl('@function.call.typescript', palette.green, palette.none, 'bold')
-    set_hl('@function.method.call.tsx', palette.green, palette.none, 'bold')
-    set_hl('@function.call.tsx', palette.green, palette.none, 'bold')
-    set_hl('@lsp.type.function', palette.green, palette.none, 'bold')
-    set_hl('@keyword.tsx', palette.red, palette.none, 'bold')
-    set_hl('@keyword.return.tsx', palette.red, palette.none, 'bold')
-    set_hl('@keyword.function.tsx', palette.red, palette.none, 'bold')
-    set_hl('@type.typescript', palette.yellow, palette.none, 'italic')
-
-    set_hl('@type.go', palette.yellow, palette.none, 'italic')
-  end,
-})
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded ()
@@ -320,6 +322,10 @@ require('lazy').setup {
         --   },
         -- },
         -- pickers = {}
+        file_ignore_patterns = {
+          '.git',
+          'node_modules',
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -684,16 +690,23 @@ require('lazy').setup {
     dark_variant = 'everforest',
     lazy = false,
     priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'everforest'
-      vim.g.everforest_enable_italic = true
-    end,
+    -- config = function()
+    --   vim.cmd.colorscheme 'everforest'
+    --   vim.g.everforest_enable_italic = true
+    -- end,
   },
   {
     'rose-pine/neovim',
     name = 'rose-pine',
     variant = 'moon', -- auto, main, moon, or dawn
     dark_variant = 'moon', -- main, moon, or dawn
+    config = function()
+      require('rose-pine').setup {
+        highlight_groups = {
+          ['@keyword.tsx'] = { bold = true, fg = 'pine' },
+        },
+      }
+    end,
   },
 
   -- Highlight todo, notes, etc in comments
