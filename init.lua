@@ -291,37 +291,32 @@ require('lazy').setup {
       -- { 'nvim-tree/nvim-web-devicons' }
     },
     config = function()
-      -- Telescope is a fuzzy finder that comes with a lot of different things that
-      -- it can fuzzy find! It's more than just a "file finder", it can search
-      -- many different aspects of Neovim, your workspace, LSP, and more!
-      --
-      -- The easiest way to use telescope, is to start by doing something like:
-      --  :Telescope help_tags
-      --
-      -- After running this command, a window will open up and you're able to
-      -- type in the prompt window. You'll see a list of help_tags options and
-      -- a corresponding preview of the help.
-      --
-      -- Two important keymaps to use while in telescope are:
-      --  - Insert mode: <c-/>
-      --  - Normal mode: ?
-      --
-      -- This opens a window that shows you all of the keymaps for the current
-      -- telescope picker. This is really useful to discover what Telescope can
-      -- do as well as how to actually do it!
+      local telescope = require 'telescope'
+      local actions = require 'telescope.actions'
 
-      -- [[ Configure Telescope ]]
-      -- See `:help telescope` and `:help telescope.setup()`
-      require('telescope').setup {
-        -- You can put your default mappings / updates / etc. in here
-        --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        -- pickers = {}
+      -- https://github.com/MagicDuck/grug-far.nvim/pull/305
+      local is_windows = vim.fn.has 'win64' == 1 or vim.fn.has 'win32' == 1
+      local vimfnameescape = vim.fn.fnameescape
+      local winfnameescape = function(path)
+        local escaped_path = vimfnameescape(path)
+        if is_windows then
+          local need_extra_esc = path:find '[%[%]`%$~]'
+          local esc = need_extra_esc and '\\\\' or '\\'
+          escaped_path = escaped_path:gsub('\\[%(%)%^&;]', esc .. '%1')
+          if need_extra_esc then
+            escaped_path = escaped_path:gsub("\\\\['` ]", '\\%1')
+          end
+        end
+        return escaped_path
+      end
+
+      local select_default = function(prompt_bufnr)
+        vim.fn.fnameescape = winfnameescape
+        local result = actions.select_default(prompt_bufnr, 'default')
+        vim.fn.fnameescape = vimfnameescape
+        return result
+      end
+      telescope.setup {
         file_ignore_patterns = {
           '.git',
           'node_modules',
@@ -329,6 +324,16 @@ require('lazy').setup {
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
+          },
+        },
+        defaults = {
+          mappings = {
+            i = {
+              ['<cr>'] = select_default,
+            },
+            n = {
+              ['<cr>'] = select_default,
+            },
           },
         },
       }
@@ -698,8 +703,8 @@ require('lazy').setup {
   {
     'rose-pine/neovim',
     name = 'rose-pine',
-    variant = 'moon', -- auto, main, moon, or dawn
-    dark_variant = 'moon', -- main, moon, or dawn
+    variant = 'main', -- auto, main, moon, or dawn
+    dark_variant = 'main', -- main, moon, or dawn
     config = function()
       require('rose-pine').setup {
         highlight_groups = {
